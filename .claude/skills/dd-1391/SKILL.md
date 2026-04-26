@@ -57,14 +57,16 @@ EQUIPMENT FROM OTHER APPROPRIATIONS (NON-ADD)                        ([EOA])
 
 ## Building inventory (locked identifiers and totals)
 
-| Building | PAX ID | Fi Web | iNFADS RPUID | Primary CCN | GSF | Total Funded ($) | Total Project ($) | LSH ($) | PRV ($) |
-|----------|--------|--------|--------------|-------------|-----|----------------:|-------------------:|--------:|--------:|
-| SCH-1024 | 387356 | BU26PPE70M | 148675 | 14345 (Armory) | 84,861 | 10,012,635 | 10,413,140 | 2,413,084 | 96,523,347 |
-| SCH-3213 | 387624 | BU26PPE72M | 48879 | 61010 (BN HQ) | 13,484 | 5,190,315 | 5,397,928 | 272,333 | 10,893,334 |
-| SCH-3237 | 387622 | BU26PPE73M | 51473 | 44112 (Storage) | 30,973 | 1,399,544 | 1,455,526 | 665,905 | 26,636,215 |
-| SCH-3270 | 387568 | BU26PPE74M | 1174058 | 21451 (Auto Org Shop) | 25,390 | 3,392,070 | 3,527,753 | 987,690 | 39,507,617 |
-| SCH-3314 | 387433 | BU26PPE71M | 50931 | 61072 (BN/Sqdn HQ) | 28,699 | 1,874,407 | 1,949,383 | 745,670 | 29,826,797 |
-| **PORTFOLIO** | | | | | | **21,868,971** | **22,743,730** | | |
+| Building | PAX ID | Fi Web | iNFADS RPUID | iNFADS-locked Description | Primary CCN | GSF | Total Funded ($) | Total Project ($) | LSH ($) | PRV ($) |
+|----------|--------|--------|--------------|----------------------------|-------------|-----|----------------:|-------------------:|--------:|--------:|
+| SCH-1024 | 387356 | BU26PPE70M | 148675 | MULTI PURPOSE BEQ/BOQ/CO HQS | 14345 (Armory) | 84,861 | 10,012,635 | 10,413,140 | 2,413,084 | 96,523,347 |
+| SCH-3213 | 387624 | BU26PPE72M | 48879 | COMPANY HQ | 61010 (BN HQ) | 13,484 | 5,190,315 | 5,397,928 | 272,333 | 10,893,334 |
+| SCH-3237 | 387622 | BU26PPE73M | 51473 | WAREHOUSE/ARMORY | 44112 (Storage) | 30,973 | 1,399,544 | 1,455,526 | 665,905 | 26,636,215 |
+| SCH-3270 | 387568 | BU26PPE74M | 1174058 | AUTO ORGANIZATIONAL SHOP CAB | 21451 (Auto Org Shop) | 25,390 | 3,392,070 | 3,527,753 | 987,690 | 39,507,617 |
+| SCH-3314 | 387433 | BU26PPE71M | 50931 | BATTALION SQUADRON HEADQUARTERS | 61072 (BN/Sqdn HQ) | 28,699 | 1,874,407 | 1,949,383 | 745,670 | 29,826,797 |
+| **PORTFOLIO** | | | | | | | **21,868,971** | **22,743,730** | | |
+
+The iNFADS-locked Description is what PAX renders on the green-highlighted top row of Block 9 Data, with Quantity 1.00 and Unit Cost = full Total Project Cost in raw dollars. Operator cannot edit Description, Classification of Work, Work Type, UM, or Quantity on that row.
 
 ## LSH placement decision (manual is silent)
 

@@ -8,14 +8,22 @@ All amounts in $000s to three decimal places. Dollar values exactly as in the CE
 
 ---
 
-## Parent line (PAX-auto from iNFADS, NOT operator entered)
+## iNFADS-locked row (PAX-auto, NOT operator entered)
+
+This is the row PAX renders at the top of the Block 9 Data items table. The Description, Classification of Work, Work Type, UM, and Quantity come from the iNFADS property record and are not operator-editable. Unit Cost and Total are PAX-calculated.
 
 ```
-ARMORY AND FIRST FLOOR RENOVATION Camp Schwab 4th MarRegt / CLB-4 84,861 GSF RPUID 148675
- CCN: 14345  Class: R  Type: RM  UM: SF  Qty: 84,861  Unit Cost: $122.71  Amount ($000): 10,413
+Description:                MULTI PURPOSE BEQ/BOQ/CO HQS
+Classification of Work:     C
+Work Type:                  RM
+UM:                         SF
+Quantity:                   1.00
+Unit Cost ($):              10,413,140.00
+Total Cost ($000):          10,413
 ```
 
-The parent line is locked by the iNFADS-PAX property record connection. CCN, Class, Type, UM, Qty, RPUID are not operator-editable. Unit Cost is back-calculated from Total Project Cost (rounded) divided by total GSF: $10,413 / 84,861 SF = $122.71/SF.
+Total = Total Project Cost (rounded to nearest $1,000) = $10,413K. PAX back-calculates Unit Cost from Total / Quantity at 1.00 SF.
+
 
 ## Operator-entered Block 9 cost estimate
 
@@ -80,6 +88,41 @@ The current PAX .md reflects pre-correction LSH ($1,952.238K) from workbook. Wor
 - Consolidated 11 UNIFORMAT-grouped scope lines into a single Primary Facility line (Conversion/Alteration of armory and 1st floor renovation).
 - Repositioned LSH from a free-standing line between Contingency and Design to a Special Construction Features sub-line under Supporting Facilities.
 - Added Total Project Cost (Rounded) and Equipment from Other Appropriations (NON-ADD) lines per AF MILCON exemplar pattern.
+
+## PAX Block 9 Data item-list mirror (paste-ready)
+
+This is the same canonical architecture above, expressed as rows that paste directly into the PAX Block 9 Data items table. Order matches the canonical face. All totals reconcile.
+
+```
+ROW                                                           UM   Qty       Unit Cost ($)        Total ($000)
+--------------------------------------------------------------|----|---------|--------------------|-------------
+PRIMARY FACILITIES                                            |    |         |                    |  5,520.182
+  MULTI PURPOSE BEQ/BOQ/CO HQS                              |  SF| 1.00    |         5,520,182.00|  5,520.182
+  (Conversion/Alteration; per workbook ESTIMATE tab)          |    |         |                    |
+                                                               |    |         |                    |
+SUPPORTING FACILITIES                                         |    |         |                    |  2,413.084
+  SPECIAL CONSTRUCTION FEATURES                               |  LS| 1.00    |         2,413,084.00|  2,413.084
+  (Life Safety and Health upgrades, 2.5% of PRV;               |    |         |                    |
+  NAVFAC 11010.44E CH-1 / MCO 11000.12)                        |    |         |                    |
+```
+
+**Cost rollup adders (Contingency, SIOH, Design, CM, DB Design) — two equivalent options:**
+
+**Option A: Apply via PAX `%` (percent items) below the items list.** This is the cleanest representation of the canonical face. Each row is a separate percent item that PAX auto-calculates against the appropriate base.
+
+| Order | Percent item label | Rate | PAX `%` Base | Resulting $000 |
+|-------|--------------------|------|--------------|----------------:|
+|   1   | CONTINGENCY                            | 10.0% | Primary only           |     552.018 |
+|   2   | SIOH (OCONUS FSRM customer-directed)   | 8.0%  | Subtotal + Contingency |     678.823 |
+|   3   | DESIGN (NAVFAC agency-directed)        | 6.0%  | Subtotal + Contingency |     509.117 |
+|   4   | CONSTRUCTION MANAGEMENT                | 4.0%  | Subtotal + Contingency |     339.411 |
+|   5   | DESIGN/BUILD - DESIGN COST             | 4.0%  | Total Funded Cost      |     400.505 |
+
+Total Project Cost rolls up to $10,413,140 ≈ $10,413K (rounded). Total Funded Cost = $10,012,635.
+
+**Option B: Bake adders into a single dollar item.** If percent items are not in use for FY27 in PAX, add one dollar item to the Supporting Facilities section labeled `PROGRAM ADDERS (CONTINGENCY 10%, SIOH 8%, DESIGN 6%, CM 4%, DB DESIGN 4%)` with Total ($000) = $2,479.874 so the items list sums to the same Total Request of $10,413K. Block 10 narrative carries the rate breakdown.
+
+Use whichever option the FY27 PAX configuration accepts. Dollar value to the parent locked row is identical either way.
 
 ## Block 10 paired statement (PRIMARY FACILITY PS)
 
