@@ -1,0 +1,4 @@
+working/
+*.tmp
+~$*.xlsx
+.DS_Store
