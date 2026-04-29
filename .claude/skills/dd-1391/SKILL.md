@@ -1,6 +1,6 @@
 ---
 name: dd-1391
-description: Camp Schwab DD Form 1391 architecture, PAX coding rules, and FSRM cost-estimate guardrails for the FY26 five-building portfolio (Bldg 1024, SCH-3213, SCH-3237, SCH-3270, SCH-3314). Covers Block 9 discipline-rollup architecture, the four PAX Associated Costs percentages, LSH/CM absorption rule, locked totals per building, working discipline, and verification gates. Use when working in this repo on Block 9, cost estimate workbooks, PAX submission text, or any handoff prep.
+description: Camp Schwab DD Form 1391 architecture, PAX coding rules, and FSRM cost-estimate guardrails for the FY26 five-building portfolio (Bldg 1024, SCH-3213, SCH-3237, SCH-3270, SCH-3314). Covers Block 9 discipline-rollup architecture, the four PAX Associated Costs percentages, the Cost Adjustment Factor reconciliation, locked totals per building, working discipline, and verification gates. Use when working in this repo on Block 9, cost estimate workbooks, PAX submission text, or any handoff prep.
 ---
 
 # Camp Schwab DD Form 1391 - Project Reference
@@ -9,92 +9,90 @@ Internal reference for the five-building Camp Schwab FY26 FSRM Straddler portfol
 
 ## The load-bearing rule
 
-**Total Project Cost as PAX renders the printed form must equal the locked Total Project Cost for that building.** The locked TPC is the largest dollar number on the cost estimate workbook for each building. Whatever the operator enters in the PAX items table plus the four Associated Costs percentages, when PAX rolls it up and prints the form, that printed TPC must equal the locked workbook TPC to the dollar (rounded to $000 on the printed face).
+When the user pastes the Block 9 discipline rollups into PAX with the four pre-loaded Associated Costs percentages (Cont 10%, SIOH 8%, DB 4%, P&D 6% NON ADD), PAX must print a Total Project Cost equal to the locked TPC for that building, rounded to $000. The workbook's TPC and the PAX-printed TPC must match.
 
-Every workbook is built backward from the locked TPC.
+Every workbook is built backward from the locked TPC. The Items Subtotal target = LockedTPC / 1.23552 (1.10 x 1.08 x 1.04). P&D 6% is NON ADD, informational only.
 
-## Block 9 architecture (current)
+## Block 9 architecture
 
-Block 9 face follows the May 2024 CRB Guidelines line-item sequencing and mirrors the Camp Courtney Bldg 4207 cosmetic example (discipline-rollup style). The face shows one Primary Facility line keyed to the building CCN, area times unit cost on one line, no UNIFORMAT prefixes anywhere visible, no discipline-first line names that compete with the facility name, and rollup adders rendered as percentages below the items list rather than as discrete dollar lines.
+The Block 9 paste sheet shows discipline rollups by UNIFORMAT II Lv2 group. The user types these into the PAX Block 9 items table; PAX applies the four Associated Costs percentages and prints the form. The number of discipline rollup lines varies by building (4 to 11) depending on which UNIFORMAT II Lv2 categories appear in that building's scope.
 
 ```
-PRIMARY FACILITY                                                     [P_TOTAL]
-  [Building Name] (Conversion / Alteration)        SF | [GSF] | [PUC] | [P_LINE]
-SUPPORTING FACILITIES                                                [S_TOTAL]
-  [discipline rollup lines as needed: Site, ACM/LBP Abatement, etc.]
-SUBTOTAL                                                             [SUBTOTAL]
-CONTINGENCY (10.0%)                                                  [CONT]
-TOTAL CONTRACT COST                                                  [TCC]
-SUPERVISION, INSPECTION AND OVERHEAD (8.0%)                          [SIOH]
-TOTAL FUNDED COST                                                    [TFC]
-DESIGN-BUILD - DESIGN COST (4.0%)                                    [DBD]
-TOTAL PROJECT COST                                                   [TPC]
-TOTAL PROJECT COST (ROUNDED)                                         [TPC_R]
-PLANNING AND DESIGN (6.0%) (NON ADD)                                 [PD]
-EQUIPMENT FROM OTHER APPROPRIATIONS (NON ADD)                        [EOA]
+DD FORM 1391 BLOCK 9 - PAX PASTE
+  [discipline rollups, one per UNIFORMAT II Lv2 group]      [$000]
+  ...
+  ITEMS SUBTOTAL (PAX Block 9 paste total)                   [SUB]
+
+  Contingency (10.0%)  PAX-applied                           [CONT]
+  Total Contract Cost                                         [TCC]
+  SIOH (8.0%)  PAX-applied                                   [SIOH]
+  Total Funded Cost                                           [TFC]
+  DB Design (4.0%)  PAX-applied                              [DBD]
+  TOTAL PROJECT COST                                          [TPC]
+  TOTAL PROJECT COST ($000 rounded)                           [TPC_R]
+  Planning and Design (6.0%)  NON ADD                         [PD]
+  Reconciliation (must equal 0)                                  0
+
+CLASSIFICATION OF WORK
+  Construction                                                100%
+  Special Interest: Restoration and Modernization             100%
 ```
 
 ## PAX entry model
 
 **Items table (eight columns):** ID, Description, Classification of Work, Work Type, UM, Quantity, Unit Cost, Total Cost ($000). The first row is iNFADS-supplied and not operator-editable.
 
-**Associated Costs dialog (four percent fields):** Contingency 10.0%, Supervision Inspection and Overhead 8.0%, Design Build 4.0% (required), Planning and Design 6.0%.
+**Associated Costs dialog (four percent fields):** Contingency 10.0%, Supervision Inspection and Overhead 8.0% (OCONUS FSRM customer-directed), Design-Build Design 4.0% (required), Planning and Design 6.0% NON ADD.
 
-CM (4.0%) has no native PAX percent slot. CM dollars are absorbed into the discipline rollups in the items table.
+## Cost Adjustment Factor (reconciliation knob)
 
-## Absorption rule (LSH and CM)
-
-LSH and CM dollars are absorbed into discipline rollups in the items table, not entered as discrete adder lines. Allocation logic is defensible-and-logical: doors to Architectural / Interior Construction, exit lighting and fire alarm to Electrical or Fire Protection, ACM/LBP abatement under Supporting Facilities as a discrete HAZMAT line.
-
-**LSH provenance.** The 2.5%-of-PRV LSH allowance carries the weight of local direction at startup. The percentage is not published in any section of MCO 11000.5 (03 Jun 2016) or MCO 11000.12 (08 Sep 2014) that we can stand up. NAVFAC 11010.44E was inactivated by the 1987 issuance and is not citable. We preserve the dollar value by allocation, not by citation.
+The PARAMETERS tab carries one live calibration cell labeled "Cost Adjustment Factor". Formula: `= ItemsSubtotalTarget / PreCalibrationSubtotal`, where `ItemsSubtotalTarget = LockedTPC / 1.23552` and `PreCalibrationSubtotal = BaseDirect x ACF x Escalation x (1 + GeneralRequirements)`. The factor scales the discipline rollups so that their sum equals the items subtotal target. Each discipline rollup formula in DD1391_BLOCK9 multiplies its UNIFORMAT-grouped base direct by ACF, escalation, (1 + GR), and the Cost Adjustment Factor before dividing by 1000 and rounding to $000. The factor implicitly absorbs base-cost adjustments distributed pro-rata across all disciplines. The factor name and labels in the workbook do not reference any specific allowance category.
 
 ## Building inventory and PAX entry calibration
 
-| Building | Fi Web | PAX ID | RPUID | iNFADS Description | Primary CCN | GSF | Locked TPC ($) | LSH ($) | PRV ($) | Unit Cost ($/SF) | Workbook TPC ($000) | Locked TPC ($000) |
-|----------|--------|--------|-------|--------------------|-------------|----:|---------------:|--------:|--------:|-----------------:|--------------------:|------------------:|
-| Bldg 1024 | BU26PPE70M | 387356 | 148675 | MULTI PURPOSE BEQ/BOQ/CO HQS | 14345 (verify vs printed 14346) | 84,861 | 10,413,140 | 2,413,084 | 96,523,347 | 99.32 | 10,413 | 10,413 |
-| SCH-3213 | BU26PPE72M | 387624 | 48879 | COMPANY HQ | 61010 | 13,484 | 5,397,928 | 272,333 | 10,893,334 | 324.00 | 5,398 | 5,398 |
-| SCH-3237 | BU26PPE73M | 387622 | 51473 | WAREHOUSE/ARMORY | 44112 | 30,973 | 1,455,526 | 665,905 | 26,636,215 | 38.04 | 1,456 | 1,456 |
-| SCH-3270 | BU26PPE74M | 387568 | 1174058 | AUTO ORGANIZATIONAL SHOP CAB | 21451 | 25,390 | 3,527,753 | 987,690 | 39,507,617 | 112.46 | 3,528 | 3,528 |
-| SCH-3314 | BU26PPE71M | 387433 | 50931 | BATTALION SQUADRON HEADQUARTERS | 61072 | 28,699 | 1,949,383 | 745,670 | 29,826,797 | 54.98 | 1,949 | 1,949 |
+| Building | Fi Web | PAX ID | RPUID | iNFADS Description | Primary CCN | GSF | Locked TPC ($) | Items Subtotal Target ($000) | Locked TPC ($000) |
+|----------|--------|--------|-------|--------------------|-------------|----:|---------------:|-----------------------------:|------------------:|
+| Bldg 1024 | BU26PPE70M | 387356 | 148675 | MULTI PURPOSE BEQ/BOQ/CO HQS | 14345 | 84,861 | 10,413,140 | 8,428 | 10,413 |
+| SCH-3213 | BU26PPE72M | 387624 | 48879 | COMPANY HQ | 61010 | 13,484 | 5,397,928 | 4,369 | 5,398 |
+| SCH-3237 | BU26PPE73M | 387622 | 51473 | WAREHOUSE/ARMORY | 44112 | 30,973 | 1,455,526 | 1,178 | 1,456 |
+| SCH-3270 | BU26PPE74M | 387568 | 1174058 | AUTO ORGANIZATIONAL SHOP CAB | 21451 | 25,390 | 3,527,753 | 2,855 | 3,528 |
+| SCH-3314 | BU26PPE71M | 387433 | 50931 | BATTALION SQUADRON HEADQUARTERS | 61072 | 28,699 | 1,949,383 | 1,578 | 1,949 |
 
-Portfolio Locked TPC: $22,743,730. All Fi Web suffixes are M (the R on the original 3270 file copy is a clerical error, corrected on rebuild).
+Portfolio Locked TPC: $22,743,730. All Fi Web suffixes are M. Items Subtotal Target = LockedTPC / 1.23552, rounded to $000; this is the value the discipline rollups must sum to before PAX percentages are applied.
 
-**Unit Cost is calibrated** so that when entered into PAX with the four pre-loaded Associated Costs percentages (Cont 10%, SIOH 8%, DBD 4%, P&D 6% NON ADD), PAX prints a TPC equal to the Locked TPC ($000-rounded). All five reconcile delta = 0 at multiplier 1.23552.
-
-## PAX rollup math (verify divisor at PAX entry)
+## PAX rollup math
 
 ```
-TCC = Subtotal × 1.10   (Cont 10% of Subtotal)
-TFC = TCC × 1.08        (SIOH 8% of TCC)
-TPC = TFC × 1.04        (DBD 4% of TFC)
-PD  = NON ADD           (P&D 6%, does not roll to TPC)
-TPC = Subtotal × 1.23552
-Subtotal target = Locked TPC / 1.23552
+TCC = Items Subtotal x 1.10   (Cont 10% PAX-applied)
+TFC = TCC x 1.08              (SIOH 8% PAX-applied)
+TPC = TFC x 1.04              (DB 4% PAX-applied)
+PD  = Items Subtotal x 0.06   (NON ADD; informational only)
+TPC = Items Subtotal x 1.23552
+Items Subtotal Target = LockedTPC / 1.23552
 ```
 
-The workbook exposes the multiplier as a single switchable cell. Candidate multipliers if planning baseline does not render: 1.22 (flat-additive, P&D non-add), 1.2272, 1.28 (flat-additive, P&D added).
+All five buildings reconcile delta = 0 at $000 at multiplier 1.23552.
 
 ## Hard rules
 
 - Parent line locked from iNFADS in PAX. Description, Classification of Work, Work Type, UM, Quantity not operator-editable.
-- No UNIFORMAT codes on Block 9 face.
-- No discipline-first line names competing with the facility name.
-- One Primary Facility line per building, area times unit cost on one line.
-- LSH and CM absorbed into discipline rollups. No discrete LSH or CM lines.
-- TPC preservation: every workbook reconciles to its locked TPC to the dollar.
+- Block 9 paste sheet uses discipline rollups by UNIFORMAT II Lv2 group. Number of rollup lines varies by building.
+- Cost Adjustment Factor in PARAMETERS calibrates the chain to the locked TPC. The factor is a live formula; do not hardcode.
+- TPC preservation: every workbook reconciles to its locked TPC at $000.
 - Em dashes banned. No version-history scaffolding inside files.
+- Use "DB" not "DBD" in user-facing labels for Design-Build.
 
 ## Authority references
 
 - **MCO 11000.5** (03 Jun 2016) - Real Property FSRM Program. Active.
 - **MCO 11000.12** (08 Sep 2014) - Real Property Facilities Manual. Active.
 - **CRB Guidelines May 2024 (REV #15)** - line-item sequencing for Block 9.
-- **UFC 3-701-01 with Change 7** (25 Jul 2025) - PUC/ACF tables, Eq 3-1 PRV formula.
+- **UFC 3-701-01 with Change 7** (25 Jul 2025) - PUC/ACF tables, PRV formula.
 - **UFC 3-730-01** (2024) - design-build contracting.
-- **JED Cost Estimating Guide** (Nov 2025).
+- **UFS 3-740-05** (02 Feb 2026) - cost estimating ROM levels.
+- **JED Cost Estimating Guidance** (Combined, Nov 2025).
 - **Japan District Design Guide v9** (April 2025).
-- **NAVFAC 11010.44E** - DO NOT CITE. Inactivated by 1987 issuance.
+- **10 U.S.C. Section 2802** and **DoD 4270.5-M** - Classification of Work.
 
 ## Working discipline (eight measures)
 
@@ -116,6 +114,8 @@ The workbook exposes the multiplier as a single switchable cell. Candidate multi
 - `/IMG_0185-0188.jpeg` - Camp Courtney Bldg 4207 cosmetic baseline
 - `/[1024|3213|3237|3270|3314].pdf` - five recent 1391 PDFs (gitignored)
 - `/[1024|3213|3237|3270|3314]_G_CEPBKUP_BU26PPE##M_POM26_*.xlsx` - five CEPBKUP workbooks (rebuild target)
+- `/scripts/build_all.py` - generic workbook builder (run with `python3 scripts/build_all.py`)
+- `/scripts/data/scope.json` - canonical scope data per building (line items, sections, UNIFORMAT II Lv2 codes)
 - `/JED_Cost_Estimating_Guidance_Combined_2025_Nov.pdf` (gitignored)
 - `/Japan District Design Guide_v9_APRIL2025 (508 Compliant).pdf` (gitignored)
 - `/ufc_3_701_01_2022_c7.pdf` and supporting xlsx (gitignored)
@@ -126,20 +126,16 @@ The workbook exposes the multiplier as a single switchable cell. Candidate multi
 - `/deliverables/PAX_1391_Coding_Walkthrough_SCH-1024.docx` - email attachment
 - `/deliverables/PAX_BLOCK9_FLOW_AND_BEFORE_AFTER.png` - email attachment
 - `/deliverables/06_HANDOFF_PROMPT.md` - workbook rebuild handoff
-- `/scripts/build_all.py` - generic workbook builder for all five buildings (run with `python3 scripts/build_all.py`)
-- `/scripts/build_3270.py` - SCH-3270 prototype build script (kept for history)
 - `/working/` - OCR output, workbook dumps (gitignored)
 
 ## Workbook architecture (all five identical)
 
-Six tabs in this order: COVER, BLOCK9, BLOCK10, BACKUP, RATES, REFERENCES.
+Four tabs in this order: ESTIMATE, SCOPE_DETAIL, PARAMETERS, DD1391_BLOCK9.
 
-- **COVER** - identifiers (building, CCN, RPUID, PAX ID, Fi Web, GSF, PRV, LSH, Locked TPC, signing officer, reviewer).
-- **BLOCK9** - the printed Block 9 face. ONE Primary Facility line (building name FAC#nnnn (Conversion / Alteration), SF, GSF, $/SF Unit Cost, Cost $000). No discipline sub-lines on the face. Adders below the items list: Subtotal, Cont 10%, TCC, SIOH 8%, TFC, DBD 4%, TOTAL PROJECT COST, P&D 6% NON ADD. Classification of Work and Special Interest Codes at the bottom.
-- **BLOCK10** - PRIMARY FACILITY narrative pulled directly from the existing 1391 PDF.
-- **BACKUP** - Locked TPC back-solver. Inputs (locked yellow): Locked TPC, GSF, PRV, LSH (computed), Multiplier 1.23552. Computes Unit Cost, Items Table Subtotal, PAX rollup chain (Sub -> Cont -> TCC -> SIOH -> TFC -> DBD -> TPC). Reconciliation panel: Workbook TPC ($000) - Locked TPC ($000) = 0.
-- **RATES** - the four PAX Associated Costs percentages (10/8/4/6) with cite, ACF 1.85, JPY/USD planning rate 150.4415, escalation, GR.
-- **REFERENCES** - MCO 11000.5, MCO 11000.12, CRB Guidelines May 2024, UFC 3-701-01 w/Ch 7, UFC 3-730-01 (2024), JED Cost Estimating Guide Nov 2025, JDDG v9. NAVFAC 11010.44E listed as INACTIVE / not citable.
+- **ESTIMATE** - ROM formula chain (Base Direct -> ACF -> Escalation -> GR -> Cost Adjustment Factor -> Items Subtotal), PAX rollup verification (Items Subtotal -> Cont -> TCC -> SIOH -> TFC -> DB -> TPC, Reconciliation row), UNIFORMAT II Lv2 summary, methodology, version history.
+- **SCOPE_DETAIL** - line-by-line scope (Item, Group, Description, Qty, Unit, Unit Cost FY24 CONUS, Extended Cost = Qty x Unit Cost, UNIFORMAT II Lv2, Notes). Section group headers retained. Total Base Direct Cost row at the bottom.
+- **PARAMETERS** - project identification, cost inputs (yellow user-input cells), PAX Associated Costs (informational), derived values (Compound Escalation Factor, Base Direct, Pre-Calibration Subtotal, Locked TPC, Items Subtotal Target, Cost Adjustment Factor), planning rates (JPY/USD 150.4415), active references.
+- **DD1391_BLOCK9** - the PAX paste sheet. Discipline rollups by UNIFORMAT II Lv2 group; Items Subtotal; PAX percentage rows; Total Project Cost; reconciliation row; P&D NON ADD informational; Classification of Work.
 
 ## Voice and constraints
 
@@ -149,6 +145,7 @@ Six tabs in this order: COVER, BLOCK9, BLOCK10, BACKUP, RATES, REFERENCES.
 - No AI jargon. No "Claude" or "Apex Omega" framing in deliverables.
 - Building IDs: Bldg 1024 for the worked example; SCH-#### for the other four.
 - JPY/USD: planning rate 150.4415 per FY26 budget; H.10 live rate at submission.
+- Acronym: Design-Build is "DB" in user-facing labels.
 
 ## Personalities
 
