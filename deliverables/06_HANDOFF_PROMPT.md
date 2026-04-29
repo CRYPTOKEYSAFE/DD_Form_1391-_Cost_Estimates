@@ -5,7 +5,7 @@ You are picking up an in-progress workbook rebuild for Anthony L. Potter (Facili
 ## Repository context
 
 - GitHub repo: `CRYPTOKEYSAFE/DD_Form_1391-_Cost_Estimates`
-- Active branch: `claude/rebuild-cost-estimate-workbook-ZJR0M` (already checked out; do not switch unless directed)
+- Active branch: `claude/rebuild-cost-estimate-workbook-NlO5b` (already checked out; do not switch unless directed)
 - Working directory: `/home/user/DD_Form_1391-_Cost_Estimates/`
 - Skill (read first): `.claude/skills/dd-1391/SKILL.md` - already in this branch, no fetch needed
 - Generic builder: `scripts/build_all.py` - run with `python3 scripts/build_all.py` to regenerate any/all workbooks
@@ -75,7 +75,7 @@ To rebuild any/all workbooks after edits to `scripts/build_all.py`:
 python3 scripts/build_all.py
 git add *.xlsx scripts/build_all.py
 git commit -m "..."
-git push -u origin claude/rebuild-cost-estimate-workbook-ZJR0M
+git push -u origin claude/rebuild-cost-estimate-workbook-NlO5b
 ```
 
 ## Personalities
