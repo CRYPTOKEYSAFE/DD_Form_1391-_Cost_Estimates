@@ -48,17 +48,19 @@ LSH and CM dollars are absorbed into discipline rollups in the items table, not 
 
 **LSH provenance.** The 2.5%-of-PRV LSH allowance carries the weight of local direction at startup. The percentage is not published in any section of MCO 11000.5 (03 Jun 2016) or MCO 11000.12 (08 Sep 2014) that we can stand up. NAVFAC 11010.44E was inactivated by the 1987 issuance and is not citable. We preserve the dollar value by allocation, not by citation.
 
-## Building inventory
+## Building inventory and PAX entry calibration
 
-| Building | Fi Web | PAX ID | RPUID | iNFADS Description | Primary CCN | GSF | Locked TPC ($) | LSH ($) | PRV ($) |
-|----------|--------|--------|-------|--------------------|-------------|-----|---------------:|--------:|--------:|
-| Bldg 1024 | BU26PPE70M | 387356 | 148675 | MULTI PURPOSE BEQ/BOQ/CO HQS | 14345 (verify vs printed 14346) | 84,861 | 10,413,140 | 2,413,084 | 96,523,347 |
-| SCH-3213 | BU26PPE72M | 387624 | 48879 | COMPANY HQ | 61010 | 13,484 | 5,397,928 | 272,333 | 10,893,334 |
-| SCH-3237 | BU26PPE73M | 387622 | 51473 | WAREHOUSE/ARMORY | 44112 | 30,973 | 1,455,526 | 665,905 | 26,636,215 |
-| SCH-3270 | BU26PPE74M | 387568 | 1174058 | AUTO ORGANIZATIONAL SHOP CAB | 21451 | 25,390 | 3,527,753 | 987,690 | 39,507,617 |
-| SCH-3314 | BU26PPE71M | 387433 | 50931 | BATTALION SQUADRON HEADQUARTERS | 61072 | 28,699 | 1,949,383 | 745,670 | 29,826,797 |
+| Building | Fi Web | PAX ID | RPUID | iNFADS Description | Primary CCN | GSF | Locked TPC ($) | LSH ($) | PRV ($) | Unit Cost ($/SF) | Workbook TPC ($000) | Locked TPC ($000) |
+|----------|--------|--------|-------|--------------------|-------------|----:|---------------:|--------:|--------:|-----------------:|--------------------:|------------------:|
+| Bldg 1024 | BU26PPE70M | 387356 | 148675 | MULTI PURPOSE BEQ/BOQ/CO HQS | 14345 (verify vs printed 14346) | 84,861 | 10,413,140 | 2,413,084 | 96,523,347 | 99.32 | 10,413 | 10,413 |
+| SCH-3213 | BU26PPE72M | 387624 | 48879 | COMPANY HQ | 61010 | 13,484 | 5,397,928 | 272,333 | 10,893,334 | 324.00 | 5,398 | 5,398 |
+| SCH-3237 | BU26PPE73M | 387622 | 51473 | WAREHOUSE/ARMORY | 44112 | 30,973 | 1,455,526 | 665,905 | 26,636,215 | 38.04 | 1,456 | 1,456 |
+| SCH-3270 | BU26PPE74M | 387568 | 1174058 | AUTO ORGANIZATIONAL SHOP CAB | 21451 | 25,390 | 3,527,753 | 987,690 | 39,507,617 | 112.46 | 3,528 | 3,528 |
+| SCH-3314 | BU26PPE71M | 387433 | 50931 | BATTALION SQUADRON HEADQUARTERS | 61072 | 28,699 | 1,949,383 | 745,670 | 29,826,797 | 54.98 | 1,949 | 1,949 |
 
-Portfolio Locked TPC: $22,743,730. All Fi Web suffixes are M (the R on a 3270 file copy is a clerical error).
+Portfolio Locked TPC: $22,743,730. All Fi Web suffixes are M (the R on the original 3270 file copy is a clerical error, corrected on rebuild).
+
+**Unit Cost is calibrated** so that when entered into PAX with the four pre-loaded Associated Costs percentages (Cont 10%, SIOH 8%, DBD 4%, P&D 6% NON ADD), PAX prints a TPC equal to the Locked TPC ($000-rounded). All five reconcile delta = 0 at multiplier 1.23552.
 
 ## PAX rollup math (verify divisor at PAX entry)
 
@@ -124,7 +126,20 @@ The workbook exposes the multiplier as a single switchable cell. Candidate multi
 - `/deliverables/PAX_1391_Coding_Walkthrough_SCH-1024.docx` - email attachment
 - `/deliverables/PAX_BLOCK9_FLOW_AND_BEFORE_AFTER.png` - email attachment
 - `/deliverables/06_HANDOFF_PROMPT.md` - workbook rebuild handoff
+- `/scripts/build_all.py` - generic workbook builder for all five buildings (run with `python3 scripts/build_all.py`)
+- `/scripts/build_3270.py` - SCH-3270 prototype build script (kept for history)
 - `/working/` - OCR output, workbook dumps (gitignored)
+
+## Workbook architecture (all five identical)
+
+Six tabs in this order: COVER, BLOCK9, BLOCK10, BACKUP, RATES, REFERENCES.
+
+- **COVER** - identifiers (building, CCN, RPUID, PAX ID, Fi Web, GSF, PRV, LSH, Locked TPC, signing officer, reviewer).
+- **BLOCK9** - the printed Block 9 face. ONE Primary Facility line (building name FAC#nnnn (Conversion / Alteration), SF, GSF, $/SF Unit Cost, Cost $000). No discipline sub-lines on the face. Adders below the items list: Subtotal, Cont 10%, TCC, SIOH 8%, TFC, DBD 4%, TOTAL PROJECT COST, P&D 6% NON ADD. Classification of Work and Special Interest Codes at the bottom.
+- **BLOCK10** - PRIMARY FACILITY narrative pulled directly from the existing 1391 PDF.
+- **BACKUP** - Locked TPC back-solver. Inputs (locked yellow): Locked TPC, GSF, PRV, LSH (computed), Multiplier 1.23552. Computes Unit Cost, Items Table Subtotal, PAX rollup chain (Sub -> Cont -> TCC -> SIOH -> TFC -> DBD -> TPC). Reconciliation panel: Workbook TPC ($000) - Locked TPC ($000) = 0.
+- **RATES** - the four PAX Associated Costs percentages (10/8/4/6) with cite, ACF 1.85, JPY/USD planning rate 150.4415, escalation, GR.
+- **REFERENCES** - MCO 11000.5, MCO 11000.12, CRB Guidelines May 2024, UFC 3-701-01 w/Ch 7, UFC 3-730-01 (2024), JED Cost Estimating Guide Nov 2025, JDDG v9. NAVFAC 11010.44E listed as INACTIVE / not citable.
 
 ## Voice and constraints
 
